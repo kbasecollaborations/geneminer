@@ -213,7 +213,7 @@ class evidenceparser:
 
             result = "<table><tr><td>Evidence for genes</td></tr>"
             for gene in genes:
-                query_id = id_dictionary[gene]
+                query_id = id_dictionary[gene.upper()]
                 result +="<tr><td><pre>"
                 result += self.parse_graph(G, d, query_id, publist, gene)
                 result += "</pre></td></tr>"

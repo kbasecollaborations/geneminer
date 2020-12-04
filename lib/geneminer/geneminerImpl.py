@@ -2,9 +2,11 @@
 #BEGIN_HEADER
 import logging
 import os
+import uuid
 
 from installed_clients.KBaseReportClient import KBaseReport
 from geneminer.Utils.geneminerutils import geneminerutils
+from geneminer.Utils.htmlreportutils import htmlreportutils
 from installed_clients.WorkspaceClient import Workspace
 
 #END_HEADER
@@ -40,6 +42,7 @@ class geneminer:
         self.shared_folder = config['scratch']
         self.ws_url = config['workspace-url']
         self.gu = geneminerutils()
+        self.hr = htmlreportutils()
         #self.config = config
         #self.hr = htmlreportutils()
 
@@ -70,14 +73,21 @@ class geneminer:
         pheno = params['pheno']
         # Need to create a dictionary based on supported species
         species = params['species']
-        genomenetmine_dyn_url = 'http://ec2-18-236-212-118.us-west-2.compute.amazonaws.com:5000/networkquery/api'
+        #genomenetmine_dyn_url = 'http://ec2-18-236-212-118.us-west-2.compute.amazonaws.com:5000/networkquery/api'
+        genomenetmine_dyn_url='https://appdev.kbase.us/dynserv/a5fee7b790d9538ec21276d0e0ca88dcf0cb3687.genomenetmine/networkquery/api'
+        #genomenetmine_dyn_url = 'https://ci.kbase.us/dynserv/10a877126719dc376e6df55a83a97c58e094d3a0.genomenetmine/networkquery/api'
         #gsp = genescoreparser()
         #genomenetmine_dyn_url='https://ci.kbase.us/dynserv/0a0fc46b9d2e4fea40429d4551c31ad7462a3180.genomenetmine/networkquery/api'
         tabledata1 = self.gu.generate_query(genomenetmine_dyn_url, params['genelistref'], species, pheno)
         #print (data)
         tabledata2 = self.gu.get_evidence(genomenetmine_dyn_url, params['genelistref'], species, pheno)
         #print(data)
-        with open ("/kb/module/work/tmp.html", "w") as f:
+        directory = str(uuid.uuid4())
+        path = os.path.join("/kb/module/work/tmp", directory)
+        os.mkdir(path)
+        html_path=os.path.join(path,"index.html")
+
+        with open (html_path, "w") as f:
             f.write("<html><body>")
             f.write(tabledata1)
             f.write("</br")
@@ -86,15 +96,16 @@ class geneminer:
             f.write(tabledata2)
             f.write("</body></html>")
 
+        output = self.hr.create_html_report(path, params['workspace_name'])
+        #report = KBaseReport(self.callback_url)
+        #report_info = report.create({'report': {'objects_created':[],
+        #                                        'text_message': params['genelistref']},
+        #                                        'workspace_name': params['workspace_name']})
+        #output = {
+        #    'report_name': report_info['name'],
+        #    'report_ref': report_info['ref'],
+        #}
 
-        report = KBaseReport(self.callback_url)
-        report_info = report.create({'report': {'objects_created':[],
-                                                'text_message': params['genelistref']},
-                                                'workspace_name': params['workspace_name']})
-        output = {
-            'report_name': report_info['name'],
-            'report_ref': report_info['ref'],
-        }
         #END run_geneminer
 
         # At some point might do deeper type checking...

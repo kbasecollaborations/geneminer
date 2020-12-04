@@ -63,7 +63,12 @@ class geneminerTest(unittest.TestCase):
         #
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
+        #ret = self.serviceImpl.run_geneminer(self.ctx, {'workspace_name': "pranjan77:narrative_1607026219401",
+        #                                                     'genelistref': '51075/3/1',
+        #                                                     'species':'potatoknet',
+        #                                                      "pheno":["disease"]})
+
         ret = self.serviceImpl.run_geneminer(self.ctx, {'workspace_name': "pranjan77:narrative_1607026219401",
-                                                             'genelistref': '51075/3/1',
-                                                             'species':'potatoknet',
-                                                              "pheno":["disease"]})
+                                                             'genelistref': '51075/22/1',
+                                                             'species':'poplarknet',
+                                                              "pheno":["dormancy"]})

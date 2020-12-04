@@ -10,16 +10,17 @@ class htmlreportutils:
 
     def __init__(self):
         self.organism_dict = {}
+        self.callback_url = os.environ['SDK_CALLBACK_URL']
         pass
 
-    def create_html_report(self, callback_url, output_dir, workspace_name):
+    def create_html_report(self, output_dir, workspace_name):
         '''
          function for creating html report
         '''
 
-        dfu = DataFileUtil(callback_url)
-        report_name = 'VariationReport' + str(uuid.uuid4())
-        report = KBaseReport(callback_url)
+        dfu = DataFileUtil(self.callback_url)
+        report_name = 'genenetminer' + str(uuid.uuid4())
+        report = KBaseReport(self.callback_url)
   
         report_shock_id = dfu.file_to_shock({'file_path': output_dir,
                                             'pack': 'zip'})['shock_id']

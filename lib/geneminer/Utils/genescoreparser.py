@@ -123,6 +123,7 @@ class genescoreparser:
             #    print("output header file in: {}".format(args.out_header))
             #print("\n\nIn total, {}/{} genes were returned by KnetMiner.\n".format(len(genes_ordered), startingLen))
             #return (filtered_summary)
+
             htmlstr = "<table>"
             csv_str = filtered_summary.to_csv(sep="\t")
             csv_rows = csv_str.split("\n")
