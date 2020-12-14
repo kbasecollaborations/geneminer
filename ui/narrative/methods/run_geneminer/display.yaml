@@ -29,7 +29,7 @@ suggestions:
 parameters :
     pheno :
         ui-name : |
-            Keyword
+            Keywords (Comma separated)
         short-hint : |
             Trait or phenotype as keyword
     another_thing :
