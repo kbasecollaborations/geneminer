@@ -10,8 +10,8 @@ module geneminer {
     } ReportResults;
 
     typedef structure {
-        string geneset_ref;
-        string terms;
+        string genelistref;
+        string pheno;
     } geneminer_input;
 
 

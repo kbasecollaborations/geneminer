@@ -69,6 +69,5 @@ class geneminerTest(unittest.TestCase):
         #                                                      "pheno":["disease"]})
 
         ret = self.serviceImpl.run_geneminer(self.ctx, {'workspace_name': "pranjan77:narrative_1607026219401",
-                                                             'genelistref': '51075/22/1',
-                                                             'species':'poplarknet',
-                                                              "pheno":["dormancy"]})
+                                                             'genelistref': '51075/27/1',
+                                                              "pheno":"dormancy,germination,bud"})

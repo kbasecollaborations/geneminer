@@ -24,15 +24,18 @@ class evidenceparser:
                 sys.exit()
         #else:
             #print("request successful")
+        #exit(r.json())
 
         decoded = r.json()[u'graph']
+
 
         # remove space or newline at the end
         decoded = decoded.replace("var graphJSON=", "[")
         decoded = decoded.replace(';', '')
         decoded = decoded.replace("var allGraphData=", ",")
         decoded = decoded + "]"
-
+#        print (decoded)
+#        exit()
         return (decoded)
 
         #decoded=r.json()[u'geneTable'].split("\t")
@@ -53,9 +56,10 @@ class evidenceparser:
         }
         r = requests.post(genomenetmine_dyn_url, data=data)
         decoded = self.decode(r)
+        #print (decoded)
         return decoded
 
-    def parse_graph(self, G, d, query_id, publist, gene ):
+    def parse_graph(self, G, d, query_id, publist, gene, pub_pheno):
         # with open('xm.json') as f:
         #    data = json.load(f)
 
@@ -64,8 +68,13 @@ class evidenceparser:
         final_results=list()
 
         for p in publist:
+            if p not in pub_pheno:
+                continue
             result = ""
-            s = nx.shortest_path(G, query_id, p)
+            try:
+                s = nx.shortest_path(G, query_id, p)
+            except:
+                break
             start = None
             end = None
             i = 0
@@ -117,7 +126,9 @@ class evidenceparser:
                         r=r.replace("PMID: ","")
                         r=r.replace("[Publication]", "")
                         r=r.replace("--published_in--","")
-                        r="<a href='https://pubmed.ncbi.nlm.nih.gov/" +str(r) + "'>pubmed:" + str(r) + "</a>"
+                        pheno_terms = ", ".join(pub_pheno[p])
+
+                        r="<a href='https://pubmed.ncbi.nlm.nih.gov/" +str(r) + "'>pubmed:" + str(r) + "</a>" + "[" + pheno_terms + "]"
                     result += r
 
                 if start is None:
@@ -175,7 +186,6 @@ class evidenceparser:
            # print("\nYour provided traits are as follows:\n\n")
            # print(*pheno, sep=", ") # Collect all positional arguments into tuple and seperate by commasa
             decoded = self.knetScorer(genomenetmine_dyn_url, genes, species, pheno)
-            #print (decoded)
 
             data=json.loads(decoded)
 
@@ -183,6 +193,11 @@ class evidenceparser:
             # G.add_node("1")
             # G.add_node("2")
             # G.add_edge("1","2")
+            pub_pheno = defaultdict(list)
+            for j in data[1]['ondexmetadata']['concepts']:
+                for p in pheno:
+                    if 'Abstract' in str(j) and p.upper() in str(j).upper():
+                        pub_pheno[j['id']].append(p)
 
             d = defaultdict(lambda: defaultdict())
             publist = list()
@@ -204,6 +219,7 @@ class evidenceparser:
                 if type == 'Publication':
                     publist.append(id)
 
+
             edges = data[0]['edges']
 
             for k in edges:
@@ -215,7 +231,7 @@ class evidenceparser:
             for gene in genes:
                 query_id = id_dictionary[gene.upper()]
                 result +="<tr><td><pre>"
-                result += self.parse_graph(G, d, query_id, publist, gene)
+                result += self.parse_graph(G, d, query_id, publist, gene, pub_pheno)
                 result += "</pre></td></tr>"
             result += "</table>"
             #print (result)
@@ -232,11 +248,15 @@ class evidenceparser:
 
 
 if __name__=="__main__":
-    pheno=["disease"]
-    species = "potatoknet"
+    pheno=["dormancy", "germination", "bud"]
+    species = "poplarknet"
     #genes = ["PGSC0003DMG400006345"]
     genes = ["PGSC0003DMG400006345", "PGSC0003DMG400012792", "PGSC0003DMG400033029", "PGSC0003DMG400016390", "PGSC0003DMG400039594", "PGSC0003DMG400028153"]
-    genomenetmine_dyn_url='http://ec2-18-236-212-118.us-west-2.compute.amazonaws.com:5000/networkquery/api'
+    #genomenetmine_dyn_url='http://ec2-18-236-212-118.us-west-2.compute.amazonaws.com:5000/networkquery/api'
+    #genes=["POTRI.004G071600"]
+    genes=["Potri.008G077300"]
+    genes=["Potri.008G076800"]
+    genomenetmine_dyn_url = 'https://appdev.kbase.us/dynserv/a5fee7b790d9538ec21276d0e0ca88dcf0cb3687.genomenetmine/networkquery/api'
     gsp = evidenceparser()
     x = gsp.summary(genomenetmine_dyn_url, genes, species, pheno)
     print (x)
