@@ -6,7 +6,6 @@
     "contact": "help@kbase.us",
     "visible": true,
     "categories": ["active"],
-    "app_type": "editor",
     "widgets": {
         "input": null,
         "output": null
